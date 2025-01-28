@@ -12,28 +12,67 @@
             align-items: center;
             height: 100vh;
             background-color: #000;
+            overflow: hidden;
         }
 
         .video-container {
             position: relative;
-            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
         }
 
         video {
-            width: 100vw; /* Full width of the viewport */
-            height: auto; /* Maintain aspect ratio */
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Fill the screen */
         }
 
         .overlay {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%; /* Cover the live feed */
-            height: 100%; /* Cover the live feed */
-            object-fit: cover; /* Ensure image scales correctly */
-            mix-blend-mode: multiply; /* Apply Multiply blend mode */
-            opacity: 1; /* Increase visibility */
-            pointer-events: none; /* Allow clicks to pass through the overlay */
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: multiply;
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        .shutter-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .camera-toggle-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .camera-toggle-button::before {
+            content: '\1F4F7'; /* Camera icon */
+            font-size: 30px;
+            color: #000;
         }
     </style>
 </head>
@@ -41,25 +80,111 @@
     <div class="video-container">
         <video id="video" autoplay playsinline></video>
         <img class="overlay" alt="Overlay Image">
+        <button class="shutter-button" id="shutter-button"></button>
+        <button class="camera-toggle-button" id="camera-toggle-button"></button>
     </div>
+
     <script>
         window.addEventListener('load', function() {
             const video = document.getElementById('video');
             const overlay = document.querySelector('.overlay');
+            const shutterButton = document.getElementById('shutter-button');
+            const cameraToggleButton = document.getElementById('camera-toggle-button');
 
-            // Request access to the camera
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function(stream) {
-                    // Set the video source to the stream from the camera
-                    video.srcObject = stream;
-                    video.play();
-                })
-                .catch(function(err) {
-                    console.error('Error accessing the camera: ', err);
-                });
+            let currentStream;
+            let currentFacingMode = "environment"; // Start with the back camera
+
+            // Function to start the video stream
+            function startCamera(facingMode) {
+                if (currentStream) {
+                    // Stop the current stream if it exists
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+
+                // Request access to the camera with the specified facingMode
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode, focusMode: "continuous" } })
+                    .then(function(stream) {
+                        // Set the video source to the stream from the camera
+                        video.srcObject = stream;
+                        video.play();
+                        currentStream = stream; // Save the current stream
+                    })
+                    .catch(function(err) {
+                        console.error('Error accessing the camera: ', err);
+                    });
+            }
+
+            // Initialize with back camera
+            startCamera(currentFacingMode);
 
             // Set the overlay image source
-            overlay.src = 'overlay.png'; // Ensure this path is correct
+            overlay.src = "https://raw.githubusercontent.com/JosFlint/Re-Viewing_the_Gaze_Digital_Lens/refs/heads/main/Overlay.png";
+
+            // Shutter button click event to take a snapshot
+            shutterButton.addEventListener('click', function() {
+                // Create a canvas to draw the video and the overlay
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                // Set the canvas dimensions to the video dimensions
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                // Draw the video on the canvas
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Apply the overlay filter on the canvas
+                const overlayImage = new Image();
+                overlayImage.src = overlay.src;
+                overlayImage.onload = function() {
+                    // Draw the overlay on top of the video frame
+                    context.globalCompositeOperation = 'multiply';
+                    context.drawImage(overlayImage, 0, 0, canvas.width, canvas.height);
+
+                    // Convert the canvas to a data URL and trigger a download
+                    const dataURL = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = dataURL;
+                    a.download = 'snapshot.png';
+                    a.click();
+                };
+            });
+
+            // Camera toggle button to switch between front and back cameras
+            cameraToggleButton.addEventListener('click', function() {
+                // Toggle between front and back cameras
+                currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+                startCamera(currentFacingMode); // Restart the camera with the new facingMode
+            });
+
+            // Tap to focus on the camera
+            video.addEventListener('click', function(event) {
+                const videoRect = video.getBoundingClientRect();
+                const x = event.clientX - videoRect.left;
+                const y = event.clientY - videoRect.top;
+
+                if (currentStream) {
+                    const track = currentStream.getVideoTracks()[0];
+                    const capabilities = track.getCapabilities();
+
+                    if (capabilities.focus) {
+                        // If the camera supports focus adjustment
+                        track.applyConstraints({
+                            advanced: [{
+                                focusMode: 'manual',
+                                focusDistance: {
+                                    x: x / video.videoWidth, // Relative x position
+                                    y: y / video.videoHeight // Relative y position
+                                }
+                            }]
+                        }).then(() => {
+                            console.log('Focus set to position:', {x, y});
+                        }).catch(err => {
+                            console.error('Error setting focus:', err);
+                        });
+                    }
+                }
+            });
         });
     </script>
 </body>
