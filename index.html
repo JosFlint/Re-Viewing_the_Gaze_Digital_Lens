@@ -4,13 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Feed with Multiply Overlay</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+        }
+
+        .video-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100vw; /* Full width of the viewport */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Cover the live feed */
+            height: 100%; /* Cover the live feed */
+            object-fit: cover; /* Ensure image scales correctly */
+            mix-blend-mode: multiply; /* Apply Multiply blend mode */
+            opacity: 1; /* Increase visibility */
+            pointer-events: none; /* Allow clicks to pass through the overlay */
+        }
+    </style>
 </head>
 <body>
     <div class="video-container">
         <video id="video" autoplay playsinline></video>
         <img class="overlay" alt="Overlay Image">
     </div>
-    <script src="script.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            const video = document.getElementById('video');
+            const overlay = document.querySelector('.overlay');
+
+            // Request access to the camera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function(stream) {
+                    // Set the video source to the stream from the camera
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(err) {
+                    console.error('Error accessing the camera: ', err);
+                });
+
+            // Set the overlay image source
+            overlay.src = 'overlay.png'; // Ensure this path is correct
+        });
+    </script>
 </body>
 </html>
