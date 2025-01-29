@@ -174,29 +174,28 @@
         }
             
         #overlay-slider {
-    position: absolute;
-    bottom: 100px; /* Place above shutter button */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-    height: 5px;
-    outline: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-}
+            position: absolute;
+            bottom: 50%; /* Align it vertically with the bottom of the shutter button */
+            left: 30px;  /* Align it horizontally with the menu button */
+            transform: translateX(-50%) rotate(270deg); /* Rotate the slider to make it vertical */
+            width: 100px;
+            height: 5px; /* Set height for vertical slider */
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
 
-/* Custom styling for slider thumb */
-#overlay-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 15px;
-    height: 15px;
-    background: white;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
+        #overlay-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
 
     </style>
 </head>
@@ -206,7 +205,7 @@
         <img class="overlay" alt="Overlay Image">
         <button class="shutter-button" id="shutter-button"></button>
         <button class="camera-toggle-button" id="camera-toggle-button">
-    <img src="Switch_Icon.png" alt="Switch Camera" class="camera-toggle-icon">
+    <img src="Switch_Icon.png" alt="Switch Camera" alt="Switch Camera" class="camera-toggle-icon">
 </button>
 
     </div>
@@ -245,7 +244,8 @@
         <button id="infoButton" onclick="toggleInfo()">Info</button>
     </div>
     </div>
-
+<!-- Overlay Opacity Slider -->
+        <input type="range" id="overlay-slider" min="0" max="1" step="0.01" value="1">
     <script>
         window.addEventListener('load', function() {
             const video = document.getElementById('video');
