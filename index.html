@@ -10,7 +10,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100dvh;
             background-color: #000;
             overflow: hidden;
         }
@@ -54,26 +54,28 @@
         }
 
         .camera-toggle-button {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background-color: rgba(255, 255, 255, 0.7);
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(112, 112, 112, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 5px;
+}
 
-        .camera-toggle-button::before {
-            content: '\1F4F7'; /* Camera icon */
-            font-size: 30px;
-            color: #000;
-        }
+.camera-toggle-icon {
+    width: 40px;  /* Adjust size of the image */
+    height: 40px;
+    object-fit: contain; /* Ensures it fits nicely */
+}
+
       #menuButton {
         position: absolute;
             top: 20px;
@@ -175,7 +177,10 @@
         <video id="video" autoplay playsinline></video>
         <img class="overlay" alt="Overlay Image">
         <button class="shutter-button" id="shutter-button"></button>
-        <button class="camera-toggle-button" id="camera-toggle-button"></button>
+        <button class="camera-toggle-button" id="camera-toggle-button">
+    <img src="Switch_Icon.png" alt="Switch Camera" class="camera-toggle-icon">
+</button>
+
     </div>
   
 <!-- Menu Button -->
