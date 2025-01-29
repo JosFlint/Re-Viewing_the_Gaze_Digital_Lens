@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Feed with Multiply Overlay</title>
+        <title>Re-Viewing the Gaze Digital Lens</title>
     <style>
         body {
             margin: 0;
@@ -74,6 +74,100 @@
             font-size: 30px;
             color: #000;
         }
+      #menuButton {
+        position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 11;
+        }
+        #menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            height: 0;
+            overflow: hidden;
+            transition: height 0.5s ease;
+            z-index: 10;
+        }
+        #menu.open {
+            height: 100vh;
+        }
+        #menuContent {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        #menuContent a {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            margin: 10px;
+      }
+      #infoButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 12;
+        }
+        #infoPopup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 11;
+            display: flex; /* Keep it visible by default */
+        }
+        #infoPopupContent {
+            margin: 20px;
+            text-align: center;
+        }
+        #infoPopupContent h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        #infoPopupContent p {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        #infoPopupClose {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 12;
+        }
+        #infoPopupClose:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
     </style>
 </head>
 <body>
@@ -82,6 +176,41 @@
         <img class="overlay" alt="Overlay Image">
         <button class="shutter-button" id="shutter-button"></button>
         <button class="camera-toggle-button" id="camera-toggle-button"></button>
+    </div>
+  
+<!-- Menu Button -->
+        <button id="menuButton" onclick="toggleMenu()">Menu</button>
+                       
+      <!-- Menu -->
+        <div id="menu">
+            <div id="menuContent">
+                <a href="https://josflint.com">Artist Website</a>
+                <a href="https://josflint.github.io/RE-VIEWING_THE_GAZE/">Virtual Tour</a>
+                <a href="https://sdcapgshow2024.lboro.ac.uk/?post_type=student&p=336">MA Website</a>
+                <a href="https://josflint.github.io/RE-VIEWING_THE_GAZE_Filter/">Camera Filter</a>
+              </div>
+            </div>
+        <!-- Information Button -->
+        <button id="infoButton" onclick="toggleInfo()">Info</button>
+      <!-- Information Popup -->
+        <div id="infoPopup">
+            <div>
+                <h1>Information</h1>
+                <p>This interactive booklet is from Jo Flint's 2024 exhibition titled Re-Viewing the Gaze.<br><br>
+                Interface: <br><br>
+                Arrows are used to navigate through the pages.<br><br>
+                "Dark Mode" button enables dark mode.<br><br>
+                "Info" button displays this pop up. <br><br>
+                "Menu" button displays links to project and artist.<br><br>
+                "Aa" button (only on mobile), displays reading asist pop up. <br><br>
+                "Overlay" button enables project's interactive design; for more details please see page 1 of the booklet.<br><br>
+                On mobile, rotate the screen to enable two page spread.<br><br>
+                Press 'esc' on computer or back on mobile to exit full screen, returning to enter screen.<br><br>
+                Please press the "Information" button at the top right to exit this popup and return to the booklet.
+            </p>
+        <!-- Information Button -->
+        <button id="infoButton" onclick="toggleInfo()">Info</button>
+    </div>
     </div>
 
     <script>
@@ -186,6 +315,34 @@
                 }
             });
         });
+      video.addEventListener('click', (event) => {
+    const focusIndicator = document.createElement('div');
+    focusIndicator.style.position = 'absolute';
+    focusIndicator.style.border = '2px solid white';
+    focusIndicator.style.width = '50px';
+    focusIndicator.style.height = '50px';
+    focusIndicator.style.borderRadius = '50%';
+    focusIndicator.style.left = `${event.clientX - 25}px`;
+    focusIndicator.style.top = `${event.clientY - 25}px`;
+    focusIndicator.style.transition = 'opacity 0.5s ease-out';
+    focusIndicator.style.opacity = '1';
+    document.body.appendChild(focusIndicator);
+    setTimeout(() => {
+        focusIndicator.style.opacity = '0';
+        focusIndicator.remove();
+    }, 500);
+});
+
+            // Toggle menu visibility
+    function toggleMenu() {
+        const menu = document.getElementById('menu');
+        menu.classList.toggle('open');
+    }
+      // Toggle information popup
+    function toggleInfo() {
+        const infoPopup = document.getElementById('infoPopup');
+        infoPopup.style.display = infoPopup.style.display === 'none' ? 'flex' : 'none';
+    }
     </script>
 </body>
 </html>
